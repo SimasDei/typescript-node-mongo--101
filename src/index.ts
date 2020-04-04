@@ -3,8 +3,7 @@
  */
 import * as dotenv from 'dotenv';
 import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
+import { setupExpress, setupRoutes } from './config';
 import { WebpackHotModule } from './types/WebpackHotModule';
 
 dotenv.config();
@@ -17,19 +16,14 @@ const app: express.Application = express();
 /**
  *  App Configuration
  */
-app.use(helmet());
-app.use(cors());
-app.use(express.json());
-
-app.get('/', (req, res) => {
-	res.send('Ahoy Sailor o/ ⛵️');
-});
+setupExpress(app);
+setupRoutes(app);
 
 /**
  * Server Activation
  */
 const server = app.listen(process.env.PORT, () => {
-	console.log(`App is running on port ${process.env.PORT} 🥁`);
+	console.log(`API is running on port ${process.env.PORT} 🥁`);
 });
 
 /**
