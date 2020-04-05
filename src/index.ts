@@ -3,10 +3,10 @@
  */
 import * as dotenv from 'dotenv';
 import express from 'express';
+dotenv.config();
+
 import { setupExpress, setupRoutes } from './config';
 import { WebpackHotModule } from './types/WebpackHotModule';
-
-dotenv.config();
 
 /**
  * App Variables

@@ -4,9 +4,12 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 
+import { connectDb } from './db';
+
 export const setupExpress = (app: Application) => {
 	app.use(helmet());
 	app.use(cors());
 	app.use(express.json());
 	app.use(morgan('dev'));
+	connectDb();
 };
