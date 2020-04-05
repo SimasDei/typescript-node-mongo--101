@@ -3,7 +3,6 @@
  */
 import * as dotenv from 'dotenv';
 import express from 'express';
-dotenv.config();
 
 import { setupExpress, setupRoutes } from './config';
 import { WebpackHotModule } from './types/WebpackHotModule';
@@ -11,6 +10,7 @@ import { WebpackHotModule } from './types/WebpackHotModule';
 /**
  * App Variables
  */
+dotenv.config();
 const app: express.Application = express();
 
 /**
@@ -35,3 +35,15 @@ if (module.hot) {
 	module.hot.accept();
 	module.hot.dispose(() => server.close());
 }
+
+/**
+ * Handle promise rejections
+ */
+process.on('unhandledRejection', (err, promise) => {
+	console.log({
+		msg: 'Server Exploded ! 💥',
+		error: err,
+	});
+
+	server.close(() => process.exit(1));
+});
