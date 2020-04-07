@@ -6,4 +6,4 @@ export const router = express.Router();
 
 router.route('/').get(controller.getBootcamps).post(controller.createBootcamp);
 
-router.route('/:bootcampId').get(controller.getById);
+router.route('/:bootcampId').get(controller.getById).patch(controller.updateBootcamp).delete(controller.deleteBootcamp);
