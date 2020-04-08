@@ -1,7 +1,8 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 
 import { HTTPStatus } from '../types/HTTPStatus';
 import Bootcamp from '../models/Bootcamp';
+import { ErrorResponse } from '../utils/errorResponse';
 
 export const getBootcamps = async (req: Request, res: Response) => {
 	const bootcamps = await Bootcamp.find();
@@ -10,11 +11,16 @@ export const getBootcamps = async (req: Request, res: Response) => {
 		.json({ success: true, msg: 'Get all bootcamps', results: bootcamps.length, data: { bootcamps } });
 };
 
-export const getById = async (req: Request, res: Response) => {
-	const bootcamp = await Bootcamp.findById(req.params.bootcampId);
-	res
-		.status(HTTPStatus.OK)
-		.json({ success: true, msg: `Get bootcamp with name of ${bootcamp?.name}`, data: { bootcamp } });
+export const getById = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const bootcamp = await Bootcamp.findById(req.params.bootcampId);
+		if (!bootcamp) return next(new ErrorResponse('Lol, not found 🍆', 404));
+		res
+			.status(HTTPStatus.OK)
+			.json({ success: true, msg: `Get bootcamp with name of ${bootcamp?.name}`, data: { bootcamp } });
+	} catch (error) {
+		return next(new ErrorResponse(error.message, error.statusCode));
+	}
 };
 
 export const createBootcamp = async (req: Request, res: Response) => {

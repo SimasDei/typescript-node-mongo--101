@@ -1,10 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
 
-export const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
+interface AppError extends Error {
+	statusCode?: number;
+}
+
+export const errorHandler = (err: AppError, req: Request, res: Response, next: NextFunction) => {
 	console.log(err.stack);
 
-	res.status(500).json({
+	res.status(err.statusCode || 500).json({
 		success: false,
-		error: err.message,
+		error: err.message || 'Server error 💥',
 	});
 };
