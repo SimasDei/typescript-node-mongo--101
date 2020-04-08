@@ -1,4 +1,4 @@
-import { Document, Schema, Model, model } from 'mongoose';
+import { Document } from 'mongoose';
 
 export interface IBootcamp {
 	name: string;

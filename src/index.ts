@@ -5,6 +5,7 @@ import * as dotenv from 'dotenv';
 import express from 'express';
 
 import { setupExpress, setupRoutes } from './config';
+import { setupMiddleware } from './middleware';
 import { WebpackHotModule } from './types/WebpackHotModule';
 
 /**
@@ -18,6 +19,7 @@ const app: express.Application = express();
  */
 setupExpress(app);
 setupRoutes(app);
+setupMiddleware(app);
 
 /**
  * Server Activation

@@ -14,7 +14,7 @@ export const getById = async (req: Request, res: Response) => {
 	const bootcamp = await Bootcamp.findById(req.params.bootcampId);
 	res
 		.status(HTTPStatus.OK)
-		.json({ success: true, msg: `Get bootcamp with name of ${bootcamp!.name}`, data: { bootcamp } });
+		.json({ success: true, msg: `Get bootcamp with name of ${bootcamp?.name}`, data: { bootcamp } });
 };
 
 export const createBootcamp = async (req: Request, res: Response) => {
