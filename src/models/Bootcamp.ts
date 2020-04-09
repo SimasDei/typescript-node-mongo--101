@@ -2,6 +2,7 @@ import mongoose, { Model, Document } from 'mongoose';
 import slugify from 'slugify';
 
 import { IBootcampModel, IBootcamp } from '../types/Bootcamp';
+import { geocoder } from '../utils';
 
 interface IBootcampSchema extends Document, IBootcamp {}
 
@@ -97,6 +98,23 @@ const BootcampSchema = new mongoose.Schema({
 BootcampSchema.pre<IBootcampSchema>('save', function (next) {
 	console.log('Slugify has been released !', { schema: this });
 	this.slug = slugify(this.name, { lower: true });
+	next();
+});
+
+BootcampSchema.pre<IBootcampSchema>('save', async function (next) {
+	const [location] = await geocoder.geocode(this.address);
+	this.location = {
+		type: 'Point',
+		coordinates: [location.longitude as number, location.latitude as number],
+		formattedAddress: location.formattedAddress,
+		street: location.streetName,
+		city: location.city,
+		state: location.stateCode,
+		zipcode: location.zipcode,
+		country: location.countryCode,
+	};
+
+	delete this.address;
 	next();
 });
 

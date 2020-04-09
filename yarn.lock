@@ -91,6 +91,13 @@
   dependencies:
     "@types/express" "*"
 
+"@types/node-geocoder@^3.24.1":
+  version "3.24.1"
+  resolved "https://registry.yarnpkg.com/@types/node-geocoder/-/node-geocoder-3.24.1.tgz#b6ec7e39453e0c3744736197b33350c4a568d587"
+  integrity sha512-NpkCX6ooS3Fc6fjVVCWUDcq7/0siDU6zVu+Q29neHLXOGkRc9VmLvLTl3yeaDRatdpAjkD9O7hOY67zrf7WP9w==
+  dependencies:
+    "@types/node" "*"
+
 "@types/node@*", "@types/node@^13.11.0":
   version "13.11.0"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-13.11.0.tgz#390ea202539c61c8fa6ba4428b57e05bc36dc47b"
