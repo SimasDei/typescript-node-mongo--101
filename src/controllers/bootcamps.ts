@@ -13,6 +13,7 @@ export const getBootcamps = catchAsync(async (req: Request, res: Response) => {
 
 export const getById = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 	const bootcamp = await Bootcamp.findById(req.params.bootcampId);
+	if (!bootcamp) next(new ErrorResponse('Bootcamp not found 🍆', 404));
 	res
 		.status(HTTPStatus.OK)
 		.json({ success: true, msg: `Get bootcamp with name of ${bootcamp?.name}`, data: { bootcamp } });

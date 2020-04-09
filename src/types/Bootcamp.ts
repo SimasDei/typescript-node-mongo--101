@@ -4,6 +4,7 @@ export interface IBootcamp {
 	name: string;
 	description: string;
 	website: string;
+	slug: string;
 	phone: string;
 	email: string;
 	address: string;

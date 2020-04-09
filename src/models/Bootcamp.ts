@@ -1,6 +1,9 @@
-import mongoose, { Model } from 'mongoose';
+import mongoose, { Model, Document } from 'mongoose';
+import slugify from 'slugify';
 
-import { IBootcampModel } from '../types/Bootcamp';
+import { IBootcampModel, IBootcamp } from '../types/Bootcamp';
+
+interface IBootcampSchema extends Document, IBootcamp {}
 
 const BootcampSchema = new mongoose.Schema({
 	name: {
@@ -89,6 +92,12 @@ const BootcampSchema = new mongoose.Schema({
 		type: Date,
 		default: Date.now,
 	},
+});
+
+BootcampSchema.pre<IBootcampSchema>('save', function (next) {
+	console.log('Slugify has been released !', { schema: this });
+	this.slug = slugify(this.name, { lower: true });
+	next();
 });
 
 const BootcampModel: Model<IBootcampModel> = mongoose.model('Bootcamp', BootcampSchema);
