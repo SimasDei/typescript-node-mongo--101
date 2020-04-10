@@ -6,7 +6,7 @@
 	"scripts": {
 		"tsc": "tsc",
 		"start": "node dist/index.js",
-		"start:watch": "nodemon dist/index",
+		"start:watch": "concurrently \"yarn webpack\" \"nodemon dist/index.js\"",
 		"webpack": "webpack --config webpack.config.ts"
 	},
 	"author": "Simas Dei",
@@ -30,6 +30,7 @@
 		"@types/morgan": "^1.9.0",
 		"@types/node": "^13.11.0",
 		"@types/node-geocoder": "^3.24.1",
+		"concurrently": "^5.1.0",
 		"ts-loader": "^6.2.2",
 		"typescript": "^3.8.3",
 		"webpack": "^4.42.1",
