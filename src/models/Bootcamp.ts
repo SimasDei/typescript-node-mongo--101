@@ -23,7 +23,6 @@ const BootcampSchema = new mongoose.Schema({
 	},
 	website: {
 		type: String,
-		match: [/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi, 'Use a valid URL'],
 	},
 	email: {
 		type: String,
@@ -96,7 +95,6 @@ const BootcampSchema = new mongoose.Schema({
 });
 
 BootcampSchema.pre<IBootcampSchema>('save', function (next) {
-	console.log('Slugify has been released !', { schema: this });
 	this.slug = slugify(this.name, { lower: true });
 	next();
 });
