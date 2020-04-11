@@ -1,12 +1,11 @@
 import fs from 'fs';
-import path from 'path';
 import dotenv from 'dotenv';
+
+dotenv.config();
 
 import { connectDb } from '../config';
 import Bootcamp from '../models/Bootcamp';
 import { IBootcamp } from '../types/Bootcamp';
-
-dotenv.config({ path: './.env' });
 
 connectDb();
 
