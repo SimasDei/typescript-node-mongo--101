@@ -2,6 +2,7 @@
  * Required External Modules
  */
 import * as dotenv from 'dotenv';
+dotenv.config();
 import express from 'express';
 
 import { setupExpress, setupRoutes } from './config';
@@ -11,7 +12,6 @@ import { WebpackHotModule } from './types/WebpackHotModule';
 /**
  * App Variables
  */
-dotenv.config();
 const app: express.Application = express();
 
 /**

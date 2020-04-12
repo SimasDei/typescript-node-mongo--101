@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 
 import { HTTPStatus } from '../types/HTTPStatus';
 import Bootcamp from '../models/Bootcamp';
-import { ErrorResponse, catchAsync } from '../utils/';
+import { ErrorResponse, catchAsync, geocoder } from '../utils/';
 
 export const getBootcamps = catchAsync(async (req: Request, res: Response) => {
 	const bootcamps = await Bootcamp.find();
@@ -43,3 +43,24 @@ export const deleteBootcamp = catchAsync(async (req: Request, res: Response) => 
 
 	res.status(HTTPStatus.OK).json({ success: true, msg: `Bootcamp deleted` });
 });
+
+export const getBootcampsWithinRadius = async (req: Request, res: Response) => {
+	const {
+		params: { zipcode, distance },
+	} = req;
+
+	const [location] = await geocoder.geocode(zipcode);
+	const { longitude, latitude } = location;
+	const radius = parseInt(distance) / 6378;
+	const bootcamps = await Bootcamp.find({
+		location: { $geoWithin: { $centerSphere: [[longitude, latitude], radius] } },
+	});
+
+	res.status(200).json({
+		success: true,
+		results: bootcamps.length,
+		data: {
+			bootcamps,
+		},
+	});
+};
