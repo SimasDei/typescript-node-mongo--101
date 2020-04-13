@@ -8,7 +8,7 @@ export const getBootcamps = catchAsync(async (req: Request, res: Response) => {
 	let query;
 	const requestQuery = { ...req.query };
 
-	const removeFields = ['select'];
+	const removeFields = ['select', 'sort', 'page', 'limit'];
 	removeFields.forEach((param) => delete requestQuery[param]);
 
 	let queryString = JSON.stringify(requestQuery);
@@ -26,10 +26,21 @@ export const getBootcamps = catchAsync(async (req: Request, res: Response) => {
 		query = query.sort(sortBy);
 	} else query = query.sort('-createdAt');
 
+	const page = parseInt(req.query.page, 10) || 1;
+	const limit = parseInt(req.query.limit) || 50;
+	const startIndex = (page - 1) * limit;
+	const endIndex = page * limit;
+	const total = await Bootcamp.countDocuments();
+	query = query.skip(startIndex).limit(limit);
+
+	const pagination = { next: {}, prev: {}, total };
+	if (endIndex < total) pagination.next = { page: page + 1, limit };
+	if (startIndex > 0) pagination.prev = { page: page - 1, limit };
+
 	const bootcamps = await query;
 	res
 		.status(HTTPStatus.OK)
-		.json({ success: true, msg: 'Get all bootcamps', results: bootcamps.length, data: { bootcamps } });
+		.json({ success: true, msg: 'Get all bootcamps', results: bootcamps.length, pagination, data: { bootcamps } });
 });
 
 export const getById = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
