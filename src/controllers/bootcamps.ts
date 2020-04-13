@@ -6,10 +6,20 @@ import { ErrorResponse, catchAsync, geocoder } from '../utils/';
 
 export const getBootcamps = catchAsync(async (req: Request, res: Response) => {
 	let query;
-	let queryString = JSON.stringify(req.query);
+	const requestQuery = { ...req.query };
+
+	const removeFields = ['select'];
+	removeFields.forEach((param) => delete requestQuery[param]);
+
+	let queryString = JSON.stringify(requestQuery);
 	queryString = queryString.replace(/\b(gt|gte|lt|lte|in)\b/g, (match) => `$${match}`);
 
 	query = Bootcamp.find(JSON.parse(queryString));
+
+	if (req.query.select) {
+		const fields = req.query.select.split(',').join(' ');
+		query = query.select(fields);
+	}
 
 	const bootcamps = await query;
 	res
