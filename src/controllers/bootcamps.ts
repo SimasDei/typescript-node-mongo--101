@@ -21,6 +21,11 @@ export const getBootcamps = catchAsync(async (req: Request, res: Response) => {
 		query = query.select(fields);
 	}
 
+	if (req.query.sort) {
+		const sortBy = req.query.sort.split(',').join(' ');
+		query = query.sort(sortBy);
+	} else query = query.sort('-createdAt');
+
 	const bootcamps = await query;
 	res
 		.status(HTTPStatus.OK)
