@@ -5,12 +5,12 @@ export interface ICourse {
 	description: String;
 	weeks: String;
 	tuition: Number;
-	minimalSkill: IMinimalSkill;
+	minimumSkill: IMinimumSkill;
 	scholarshipAvailable: Boolean;
 	bootcamp: Types.ObjectId;
 }
 
-enum IMinimalSkill {
+enum IMinimumSkill {
 	beginner,
 	intermediate,
 	advanced,
