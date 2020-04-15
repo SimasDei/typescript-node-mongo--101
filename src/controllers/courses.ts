@@ -14,7 +14,8 @@ export const getCourses = catchAsync(async (req: Request, res: Response) => {
 	let queryString = JSON.stringify(requestQuery);
 	queryString = queryString.replace(/\b(gt|gte|lt|lte|in)\b/g, (match) => `$${match}`);
 
-	query = Course.find(JSON.parse(queryString));
+	if (req.params.bootcampId) query = Course.find({ bootcamp: req.params.bootcampId });
+	else query = Course.find(JSON.parse(queryString));
 
 	if (req.query.select) {
 		const fields = req.query.select.split(',').join(' ');
