@@ -4,6 +4,34 @@ import { HTTPStatus } from '../types/HTTPStatus';
 import Course from '../models/Course';
 import { ErrorResponse, catchAsync } from '../utils/';
 
+const querySelect = (req: Request, query: any) => {
+	if (req.query.select) {
+		const fields = req.query.select.split(',').join(' ');
+		query = query.select(fields);
+	}
+};
+const querySort = (req: Request, query: any) => {
+	if (req.query.sort) {
+		const sortBy = req.query.sort.split(',').join(' ');
+		query = query.sort(sortBy);
+	} else query = query.sort('-createdAt');
+};
+
+const paginationHandler = async (req: Request, query: any) => {
+	const page = parseInt(req.query.page, 10) || 1;
+	const limit = parseInt(req.query.limit) || 50;
+	const startIndex = (page - 1) * limit;
+	const endIndex = page * limit;
+	const total = await Course.countDocuments();
+	query = query.skip(startIndex).limit(limit);
+
+	const pagination = { next: {}, prev: {}, total };
+	if (endIndex < total) pagination.next = { page: page + 1, limit };
+	if (startIndex > 0) pagination.prev = { page: page - 1, limit };
+
+	return pagination;
+};
+
 export const getCourses = catchAsync(async (req: Request, res: Response) => {
 	let query;
 	const requestQuery = { ...req.query };
@@ -17,26 +45,31 @@ export const getCourses = catchAsync(async (req: Request, res: Response) => {
 	if (req.params.bootcampId) query = Course.find({ bootcamp: req.params.bootcampId });
 	else query = Course.find(JSON.parse(queryString));
 
-	if (req.query.select) {
-		const fields = req.query.select.split(',').join(' ');
-		query = query.select(fields);
-	}
+	// if (req.query.select) {
+	// 	const fields = req.query.select.split(',').join(' ');
+	// 	query = query.select(fields);
+	// }
+	querySelect(req, query);
 
-	if (req.query.sort) {
-		const sortBy = req.query.sort.split(',').join(' ');
-		query = query.sort(sortBy);
-	} else query = query.sort('-createdAt');
+	// if (req.query.sort) {
+	// 	const sortBy = req.query.sort.split(',').join(' ');
+	// 	query = query.sort(sortBy);
+	// } else query = query.sort('-createdAt');
 
-	const page = parseInt(req.query.page, 10) || 1;
-	const limit = parseInt(req.query.limit) || 50;
-	const startIndex = (page - 1) * limit;
-	const endIndex = page * limit;
-	const total = await Course.countDocuments();
-	query = query.skip(startIndex).limit(limit);
+	querySort(req, query);
 
-	const pagination = { next: {}, prev: {}, total };
-	if (endIndex < total) pagination.next = { page: page + 1, limit };
-	if (startIndex > 0) pagination.prev = { page: page - 1, limit };
+	// const page = parseInt(req.query.page, 10) || 1;
+	// const limit = parseInt(req.query.limit) || 50;
+	// const startIndex = (page - 1) * limit;
+	// const endIndex = page * limit;
+	// const total = await Course.countDocuments();
+	// query = query.skip(startIndex).limit(limit);
+
+	// const pagination = { next: {}, prev: {}, total };
+	// if (endIndex < total) pagination.next = { page: page + 1, limit };
+	// if (startIndex > 0) pagination.prev = { page: page - 1, limit };
+
+	const pagination = paginationHandler(req, query);
 
 	const courses = await query;
 	res
