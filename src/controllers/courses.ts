@@ -3,25 +3,18 @@ import { Request, Response, NextFunction } from 'express';
 import { HTTPStatus } from '../types/HTTPStatus';
 import Course from '../models/Course';
 import { ErrorResponse, catchAsync } from '../utils/';
-import { querySelect, querySort, paginationHandler } from './helpers';
+import { querySelect, querySort, paginationHandler, queryStringHandler, requestQueryHandler } from './helpers';
 
 export const getCourses = catchAsync(async (req: Request, res: Response) => {
 	let query;
-	const requestQuery = { ...req.query };
-
-	const removeFields = ['select', 'sort', 'page', 'limit'];
-	removeFields.forEach((param) => delete requestQuery[param]);
-
-	let queryString = JSON.stringify(requestQuery);
-	queryString = queryString.replace(/\b(gt|gte|lt|lte|in)\b/g, (match) => `$${match}`);
+	const requestQuery = requestQueryHandler(req);
+	const queryString = queryStringHandler(requestQuery);
 
 	if (req.params.bootcampId) query = Course.find({ bootcamp: req.params.bootcampId });
 	else query = Course.find(JSON.parse(queryString));
 
 	querySelect(req, query);
-
 	querySort(req, query);
-
 	const pagination = await paginationHandler(req, query, Course);
 
 	const courses = await query;
