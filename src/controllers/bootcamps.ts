@@ -3,39 +3,19 @@ import { Request, Response, NextFunction } from 'express';
 import { HTTPStatus } from '../types/HTTPStatus';
 import Bootcamp from '../models/Bootcamp';
 import { ErrorResponse, catchAsync, geocoder } from '../utils/';
+import { querySelect, querySort, paginationHandler, queryStringHandler, requestQueryHandler } from './helpers';
 
 export const getBootcamps = catchAsync(async (req: Request, res: Response) => {
 	let query;
-	const requestQuery = { ...req.query };
-
-	const removeFields = ['select', 'sort', 'page', 'limit'];
-	removeFields.forEach((param) => delete requestQuery[param]);
-
-	let queryString = JSON.stringify(requestQuery);
-	queryString = queryString.replace(/\b(gt|gte|lt|lte|in)\b/g, (match) => `$${match}`);
+	const requestQuery = requestQueryHandler(req);
+	const queryString = queryStringHandler(requestQuery);
 
 	query = Bootcamp.find(JSON.parse(queryString));
 
-	if (req.query.select) {
-		const fields = req.query.select.split(',').join(' ');
-		query = query.select(fields);
-	}
+	querySelect(req, query);
+	querySort(req, query);
 
-	if (req.query.sort) {
-		const sortBy = req.query.sort.split(',').join(' ');
-		query = query.sort(sortBy);
-	} else query = query.sort('-createdAt');
-
-	const page = parseInt(req.query.page, 10) || 1;
-	const limit = parseInt(req.query.limit) || 50;
-	const startIndex = (page - 1) * limit;
-	const endIndex = page * limit;
-	const total = await Bootcamp.countDocuments();
-	query = query.skip(startIndex).limit(limit);
-
-	const pagination = { next: {}, prev: {}, total };
-	if (endIndex < total) pagination.next = { page: page + 1, limit };
-	if (startIndex > 0) pagination.prev = { page: page - 1, limit };
+	const pagination = await paginationHandler(req, query, Bootcamp);
 
 	const bootcamps = await query;
 	res
