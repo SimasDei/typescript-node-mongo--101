@@ -1,4 +1,4 @@
-import mongoose, { Model, Document, Schema } from 'mongoose';
+import mongoose, { Model, Document, Types } from 'mongoose';
 
 import { ICourse, ICourseModel } from '../types/Course';
 
@@ -40,6 +40,32 @@ const courseSchema = new mongoose.Schema({
 		type: Date,
 		default: Date.now,
 	},
+});
+
+courseSchema.statics.getAverageCost = async function (bootcampId: Types.ObjectId) {
+	console.log("I'm a robot beep-boop");
+
+	const obj = await this.aggregate([
+		{
+			$match: { bootcamp: bootcampId },
+		},
+		{
+			$group: {
+				_id: '$bootcamp',
+				averageCost: { $avg: '$tuition' },
+			},
+		},
+	]);
+};
+
+courseSchema.pre<ICourseSchema>('remove', function () {
+	//@ts-ignore
+	this.constructor.getAverageCost(this.bootcamp);
+});
+
+courseSchema.post<ICourseSchema>('save', function () {
+	//@ts-ignore
+	this.constructor.getAverageCost(this.bootcamp);
 });
 
 const CourseModel: Model<ICourseModel> = mongoose.model('Course', courseSchema);
